@@ -2,10 +2,10 @@ import cart from './assets/carritocompras.png'
 
 const CartWidget = () => {
     return (
-        <button>
+        <div>
         <img src={cart} className='btn'/>
             0
-        </button>
+        </div>
     )
 }
 export default CartWidget
