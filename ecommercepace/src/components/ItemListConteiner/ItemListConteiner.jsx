@@ -1,31 +1,31 @@
-import { useState, useEffect } from "react"
-import { getProducts, getProductsByCategory } from "../../asyncMock"
-import ItemList from "../ItemList/ItemList"
+import { memo } from 'react'
+import { useAsync } from '../../hooks/useAsync'
+import ItemList from '../ItemList/ItemList'
+import { useParams } from 'react-router-dom'
+import { getProducts } from '../../sevices/firebase/firestore/products'
 
-import { useParams } from "react-router-dom"
+const MemoizedItemList = memo(ItemList)
 
-const ItemListConteiner = ({ greeting }) => {
-    const [products, setProducts] = useState([])
-    
-    const { categoryId } = useParams ()
+const ItemListContainer = ({ greeting }) => {
+    const { categoryId } = useParams()
 
-    useEffect(() => {
-        const asyncFunction = categoryId ? getProductsByCategory : getProducts
 
-        asyncFunction(categoryId)
-            .then(response => {
-                setProducts(response)
-            })
-    }, [categoryId] )
-    
-    
+    const asyncFunction = () => getProducts (categoryId) 
+
+    const { data: products, loading, error } = useAsync(asyncFunction, [categoryId])
+    if(loading) {
+        return <h1>Cargando...</h1>
+    }
+    if(error) {
+        return <h1>Hubo un error al cargar los productos</h1>
+    }
+
     return (
         <div>
-            <h1>{!categoryId ? greeting : (greeting + categoryId) }</h1> 
-            <ItemList products={products}/>
+            <h1>{greeting}</h1>
+            <MemoizedItemList products={products}/>
         </div>
     )
 }
-
-export default ItemListConteiner
+export default ItemListContainer
 
